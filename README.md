@@ -42,12 +42,12 @@ Supports H1 tag to caption the panel.
 1. Copy the _src/kpi/micro-ring.js_ and optionally the _micro-ring.css_ and _kpi.css_ files into your project.
 (NPM package on its way.)
 
-2. Import the file:
-`
+2. Import the file(s):
+```
 import MicroKPI from './kpi/micro-ring';
 import './kpi/micro-ring.css';
 import './kpi/kpi.css';
-`
+```
 
 3. Create one or more div tags to contain the Ring guage. Only requirement is that it has
 an `id` and `class` attribute. You can also set options using attributes in the form `data-<option-name>`.
