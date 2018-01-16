@@ -39,7 +39,7 @@ Supports H1 tag to caption the panel.
 
 ## Including in Your Project
 
-1. Copy the _src/kpi/micro-ring.tsx_ and optionally the _micro-ring.css_ and _kpi.css_ files into your project.
+1. Copy the _src/kpi/micro-ring.js_ and optionally the _micro-ring.css_ and _kpi.css_ files into your project.
 (NPM package on its way.)
 
 2. Import the file:
@@ -49,20 +49,31 @@ import './kpi/micro-ring.css';
 import './kpi/kpi.css';
 `
 
-3. Instantiate one or more ring guages:
+3. Create one or more div tags to contain the Ring guage. Only requirement is that it has
+an `id` and `class` attribute. You can also set options using attributes in the form `data-<option-name>`.
 
-`<MicroKPI title="outages" 
-    unit="e/s" 
-    limit={100} 
-    discreteLimit={10} 
-    value={55} 
-/>`
+```
+<div id="ring1"
+    class="micro-ring">
+</div>
 
-`<MicroKPI title="outside" 
-    unit="°C" 
-    limit={100} 
-    discreteLimit={10} 
-    value={55} 
-/>`
+<div id="ring2" 
+    class="micro-ring" 
+    title="outside" 
+    data-color="CornflowerBlue" 
+    data-limit="100" 
+    data-decimals="1">
+</div>
+```
 
+4. You can access the control in javascript using:
+```
+    window.ring1.value( v )
+    
+    // or update all options, using:
+    window.ring1.data({ value: 33.2, color: 'blue' })
+```
+
+
+## License
 The Ring guage is licensed under MIT, so fill your boots.
