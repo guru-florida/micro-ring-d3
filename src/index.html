@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MicroRing in D3</title>
+</head>
+<body>
+  <h1>Micro-Ring Non-React Sample</h1>
+
+  <div class="kpi-panel kpi-light">
+    <div class="kpi-row kpi-small">
+      <label>Small</label>
+      <div id="light1" class="micro-ring" title="inside" data-limit="100"></div>
+      <div id="light2" class="micro-ring" title="outside" data-color="CornflowerBlue" data-limit="100" data-decimals="1"></div>
+      <div id="light3" class="micro-ring" title="purgatory" data-color="magenta" data-limit="100"></div>
+    </div>
+    <div class="kpi-row kpi-medium">
+      <label>Small</label>
+      <div id="light21" class="micro-ring"></div>
+      <div id="light22" class="micro-ring"></div>
+      <div id="light23" class="micro-ring"></div>
+    </div>
+  </div>
+
+  <div class="kpi-panel kpi-dark">
+    <div class="kpi-row kpi-small">
+      <label>Small</label>
+      <div id="dark1" class="micro-ring"></div>
+      <div id="dark2" class="micro-ring"></div>
+      <div id="dark3" class="micro-ring"></div>
+    </div>
+    <div class="kpi-row kpi-medium">
+      <label>Small</label>
+      <div id="dark21" class="micro-ring"></div>
+      <div id="dark22" class="micro-ring"></div>
+      <div id="dark23" class="micro-ring"></div>
+    </div>
+  </div>
+
+<script type="text/javascript">
+
+  // Our data model, containing just an array of KPIs that have a value and limit
+  let data = [{
+      value: 22,
+      limit: 100
+  }, {
+      value: 32,
+      limit: 100
+  }, {
+      value: 592,
+      limit: 1000,
+      decimals: 0
+  }];
+
+  // to animate our rings, we'll just increment a counter and a sine wave and base
+  // our animation on expressions of these two counters.
+  let motion = {
+      running: true,
+      count: 0,
+      sine: 0
+  };
+
+  // Every X millis, update the state of the controls
+  setInterval( () => { if(motion.running) {
+      motion.count++;
+      motion.sine =  Math.round(Math.sin(motion.count / 10) * 50 + 50);
+
+      data[0].value = (12 + motion.count) % 100;
+      data[1].value = (19 + motion.count*0.18) % 100;
+      data[2].value = 523 + (19 + motion.sine*5.231);
+
+      window.light1.dat(data[0]);
+      window.light2.dat(data[1]);
+      window.light3.dat(data[2]);
+      window.light21.dat(data[0]);
+      window.light22.dat(data[1]);
+      window.light23.dat(data[2]);
+
+      window.dark1.dat(data[0]);
+      window.dark2.dat(data[1]);
+      window.dark3.dat(data[2]);
+      window.dark21.dat(data[0]);
+      window.dark22.dat(data[1]);
+      window.dark23.dat(data[2]);
+  }}, 200);
+</script>
+</body>
+</html>
+

@@ -1,0 +1,56 @@
+
+svg.micro-ring circle.radial-track {
+    stroke-width: 20px;
+}
+svg.micro-ring path.radial-value, svg.micro-ring g.discrete path.radial-segment {
+    stroke-width: 10px;
+}
+svg.micro-ring g.discrete path.radial-segment-zero {
+    stroke-width: 16px;
+    stroke-opacity: 0.2;
+}
+svg.micro-ring g.laps path {
+    stroke-width: 3px;
+}
+svg.micro-ring text.title {
+    font-size: 92%;
+    font-family: sans-serif;
+}
+svg.micro-ring text.value {
+    font-size: 130%;
+    font-family: sans-serif;
+    fill: white;
+}
+svg.micro-ring text.sub-line {
+    font-size: 100%;
+    font-family: sans-serif;
+    fill: white;
+}
+
+tspan.unit.unit-percent {
+    font-size: 70%;
+}
+tspan.unit {
+    font-size: 66%;
+}
+
+.kpi-light svg.micro-ring text.value {
+    fill: #222;
+}
+
+.kpi-dark svg.micro-ring text.value {
+    fill: white;
+}
+
+.kpi-thin svg.micro-ring circle.radial-track {
+    stroke-width: 2px;
+}
+.kpi-thin svg.micro-ring path.radial-value, .kpi-thin svg.micro-ring g.discrete path.radial-segment {
+    stroke-width: 4px;
+}
+.kpi-thin svg.micro-ring g.laps path {
+    stroke-width: 2px;
+}
+.kpi-thin svg.micro-ring g.discrete path.radial-segment-zero {
+    stroke-width: 3px;
+}
