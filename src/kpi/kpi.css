@@ -1,5 +1,5 @@
 .kpi-panel {
-    padding: 4em;
+    padding: 3em;
 }
 .kpi-row {
     display: flex;
@@ -7,6 +7,7 @@
 }
 .kpi-row > div {
     flex-grow: 1;
+    text-align: center;
 }
 .kpi-row > label {
     vertical-align: middle;
@@ -29,7 +30,17 @@
     max-width: 200px;
     margin-left: auto;
     margin-right: auto;
-    margin-top: -15px;
+}
+.kpi-row h5 + h6, .kpi-row h5 + ul {
+    margin-top: -20px;
+}
+.kpi-row ul li {
+    font-size: 70%;
+    color: #888;
+    list-style-position: inside;
+    text-align: left;
+    width: 200px;
+    max-width: 200px;
 }
 
 .kpi-light {

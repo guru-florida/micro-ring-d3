@@ -2,6 +2,10 @@ import * as d3 from 'd3';
 import './kpi.css';
 import './micro-ring.css';
 
+// for lap segments, we want to offset
+const lap_ranges = [
+    [45, 404.999]
+];
 
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
     var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
@@ -31,15 +35,21 @@ function MicroRing(ctrl, options) {
         title: null,
         color: "#1e66b7",
         limit: 100,
+        discreteLimit: 10,
+        lapsLimit: 100,
+        padding: 0.15,
         decimals: 0,
         unit: null
     });
 
-    // these accessor functions simply extract a value from a data object
+    // these accessor functions simply extract a field from the data object or default value
     this.accessors = {
         color: function (d) { return d.color ? d.color : _this.defaults.color },
         title: function (d) { return d.title ? d.title : _this.defaults.title },
-        value: function (d) { return d.value },
+        value: function (d) { return d.value; },
+        laps:  function (d) { return Math.floor(d.value / this.limit(d)); },
+        limit: function (d) { return d.limit ? d.limit : _this.defaults.limit },
+        discreteLimit: function(d) { return d.discreteLimit ? d.discreteLimit : _this.defaults.discreteLimit },
         arcValue: function (d) { return (d.value>=d.limit) ? 0.9999 : (d.value / d.limit) },
         toString: function(d) { return isNaN(d.value) ? d.value : d.value.toFixed(d.decimals ? d.decimals : _this.defaults.decimals) },
         x: function(d, i) { return /*120*d.id +*/ 60 },
@@ -53,48 +63,123 @@ function MicroRing(ctrl, options) {
             this.classes.push("kpi-" + options.size);
     }
 
+    // create the root SVG element
     this.svg = this.extend(
         d3.select(this.container).append("svg")
             .attr("class", this.classes.join(' '))
             .attr("preserveAspectRatio", "xMinYMin meet")
             .attr("viewBox", "0 0 120 120")
     );
-
-    this.redraw();
 }
 
 MicroRing.prototype.redraw = function(data) {
     var _this = this;
     if(!data) return;
+
+    /* D3 is very different than your typical functional style of programming. In D3, given data tuple {value, limit,
+       title, etc}, we describe how to construct a new one, update an existing one, or delete one. Each of these
+       operations is described using a chain of operations. With these chains, D3 can then manage any number of data
+       tuples by computing the intersection of previous state to new. For now MicroRing only creates 1 object, but we
+       could easily enhance it to create any number of Rings within a single SVG with automatic or plotted positions.
+
+       The following code is typical of D3 code but very radical if you are new to D3. Read about D3 data joins for
+       more info on how D3 works.
+     */
+
+    // First select any existing Rings and map to items in the data array (Only 1 for now)
     this.rings = this.extend( this.svg
         .selectAll("g.ring")
         .data( data , function(d) { return d.id; }) );
 
-    // deletion of controls that no longer exist
+    // for deletion of Rings that no longer exist, just remove...no transitions for now
     this.rings
         .exit()
         .remove();
 
-    // creation of new controls
-    this.extend(this.rings.enter()
+    // for creation of new Rings,
+    // fully describe all arcs, groups, circles and text
+    var enter = this.extend(this.rings.enter()
         .append("g")
         .attr("class", "ring")
         .attr("id", function(d) { return d.id }))
         .circle("radial-track", 45, null, 0.1)
         .label("value", -3, "black", this.accessors.toString)
-        .label("title", 15, null,  this.accessors.title)
-        .arc("radial-value", 45, 0, function(d) { return _this.accessors.arcValue(d) * 360; });
+        .label("title", 15, null,  this.accessors.title);
 
-    // update existing controls
-    this.rings.select("text.value")
+    // for update existing Ring
+    //    * update value text
+    this.rings
+        .select("text.value")
         .text(this.accessors.toString);
-    this.extend(this.rings.select("path.radial-value"))
-        .describeArc("radial-value", 45, 0, function(d) { return _this.accessors.arcValue(d) * 360; });
+
+    // for update existing Ring value segments  in either continuous or segmented mode
+    // we have to use a for-each to apply an inner D3 Join on the segments. For continuous there would be only 1 segment
+    // but for discrete mode there could be any number of segments up to discreteLimit. Also, we update the laps
+    // indicator too.
+    this.rings
+        .merge(enter)                                   // we want this chain to run on both enter and updates
+        .each( function(d, i) {
+            //
+            // For each Ring we compute the value arc
+            //
+            let val = _this.accessors.value(d) % _this.accessors.limit(d);
+            let laps = Math.min(_this.accessors.laps(d), _this.defaults.lapsLimit);
+            let discrete = (laps===0) && (val <= _this.accessors.discreteLimit(d));
+
+            // compute the radial range of the value arc
+            let range = discrete
+                ? [ -150, -150 + (Math.floor(val) / _this.accessors.discreteLimit(d)) * 300 ]
+                : [ 0, (val / _this.accessors.limit(d)) * 359.9999 ]; // not 360 or arc will wrap to 0
+
+            _this.d3Segments(this, "radial-segment", 45, discrete ? _this.defaults.padding : 0, range, discrete ? Math.floor(val) : 1);
+
+            //
+            // Also compute the arc segments for laps indicator
+            //
+            let ofs = -60 / laps;
+            _this.d3Segments(this, "lap-segment", 57, (laps>1) ? _this.defaults.padding : 0, [ofs, ofs + 359.9999], laps );
+
+        });
+        //.describeArc("radial-segment radial-value", 45, 0, function(d) { return _this.accessors.arcValue(d) * 360; });
 };
+
+MicroRing.prototype.d3Segments = function(d3o, className, radius, padding, range, count) {
+
+    // build an ordinal array of segments
+    const segs = d3.range(0, count);
+
+    let segments = d3.select(d3o)
+        .selectAll("path."+className)
+        .data( segs );
+
+    // compute the bands for each segment
+    const bands = d3.scaleBand()
+        .domain(segs)                           // create N bands where N=d.value
+        .range(range)                           // range in degrees
+        .paddingInner(padding)                  // distance between segments
+        .paddingOuter(padding/2);
+
+    // now build the D3 chain to draw the segments
+    const bw = bands.bandwidth();
+
+    segments.exit().remove();
+
+    this.extend( segments.enter() )
+        .arc(className, radius,
+            function(e,i) { return bands(e); },
+            function(e,i) { return bands(e) + bw; }
+        );
+    this.extend( segments )
+        .describeArc(className, radius,
+            function(e,i) { return bands(e); },
+            function(e,i) { return bands(e) + bw; }
+        );
+};
+
 
 MicroRing.prototype.getDefaults = function() {
     var def = {};
-    var data_attribs = "title,color,limit,decimals,unit".split(',');
+    var data_attribs = "title,color,limit,discreteLimit,lapsLimit,padding,decimals,unit".split(',');
     var v;
     for(var n in arguments) {
         var arg = arguments[n];
@@ -193,7 +278,16 @@ MicroRing.prototype.extend = function(ctrl) {
     return ctrl;
 };
 
-document.addEventListener("DOMContentLoaded", function(e) {
+MicroRing.create = function(selector) {
+    let group = {};
+    d3.select(selector).selectAll("div.micro-ring")
+        .each( function() { if(this.id) return group[this.id] = new MicroRing(this); });
+    return group;
+}
+
+window.MicroRing = MicroRing;
+
+/*document.addEventListener("DOMContentLoaded", function(e) {
     d3.selectAll("div.micro-ring")
         .each( function() { if(this.id) return window[this.id] = new MicroRing(this); });
-});
+});*/

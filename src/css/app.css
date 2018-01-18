@@ -7,3 +7,9 @@ body {
 h1 {
     text-align: center;
 }
+h1.dark {
+    background-color: #222;
+    margin: 0px;
+    padding: 1em;
+    color: ghostwhite;
+}
