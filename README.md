@@ -65,13 +65,28 @@ an `id` and `class` attribute. You can also set options using attributes in the 
     data-decimals="1">
 </div>
 ```
+4. Instantiate the controls by using a css-like selector. The MicroRing.create function
+searches within the given node selection for DIVs with the .micro-ring class and 
+instantiates a Ring control with that id. It returns an array of Ring controls that were 
+instantiated.
+
+The following code instantiates Rings from within the BODY element, or within a specific 
+container element.
+```
+    // instantiate Rings within the body element
+    var rings = window.MicroRing.create("body");
+    
+    // ... or instantiate Rings within a specific element by ID
+    var rings = window.MicroRing.create("#status-kpis");
+```
 
 4. You can access the control in javascript using:
 ```
-    window.ring1.value( v )
+    // for single data values, you can use the value function
+    rings.ring1.value( v )
     
-    // or update all options, using:
-    window.ring1.data({ value: 33.2, color: 'blue' })
+    // or provide an object with many options:
+    rings.ring1.data({ value: 33.2, color: 'blue' })
 ```
 
 
