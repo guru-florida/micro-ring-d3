@@ -32,7 +32,7 @@ function MicroRing(ctrl, options) {
         color: "#1e66b7",
         limit: 100,
         discreteLimit: 10,
-        lapsLimit: 100,
+        lapsLimit: 25,
         padding: 0.15,
         decimals: 0,
         unit: null

@@ -11,6 +11,7 @@ svg.micro-ring g.discrete path.radial-segment-zero {
 }
 svg.micro-ring g path.lap-segment {
     stroke-width: 3px;
+    stroke-opacity: 0.45;
 }
 svg.micro-ring text.title {
     font-size: 92%;
@@ -50,7 +51,6 @@ tspan.unit {
 }
 .kpi-thin svg.micro-ring g path.lap-segment {
     stroke-width: 2px;
-    stroke-opacity: 0.45;
 }
 .kpi-thin svg.micro-ring g.discrete path.radial-segment-zero {
     stroke-width: 3px;
