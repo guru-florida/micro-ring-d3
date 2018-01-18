@@ -2,10 +2,6 @@ import * as d3 from 'd3';
 import './kpi.css';
 import './micro-ring.css';
 
-// for lap segments, we want to offset
-const lap_ranges = [
-    [45, 404.999]
-];
 
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
     var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
@@ -146,21 +142,21 @@ MicroRing.prototype.redraw = function(data) {
 MicroRing.prototype.d3Segments = function(d3o, className, radius, padding, range, count) {
 
     // build an ordinal array of segments
-    const segs = d3.range(0, count);
+    var segs = d3.range(0, count);
 
-    let segments = d3.select(d3o)
+    var segments = d3.select(d3o)
         .selectAll("path."+className)
         .data( segs );
 
     // compute the bands for each segment
-    const bands = d3.scaleBand()
+    var bands = d3.scaleBand()
         .domain(segs)                           // create N bands where N=d.value
         .range(range)                           // range in degrees
         .paddingInner(padding)                  // distance between segments
         .paddingOuter(padding/2);
 
     // now build the D3 chain to draw the segments
-    const bw = bands.bandwidth();
+    var bw = bands.bandwidth();
 
     segments.exit().remove();
 
@@ -218,7 +214,7 @@ MicroRing.prototype.dat = function(v) {
     this.redraw(v);
 };
 
-const micro_ring_helpers = {
+var micro_ring_helpers = {
     g: function(className) {
         this.append("g")
         attr("class", className);
